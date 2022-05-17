@@ -1,0 +1,237 @@
+
+{
+    "paises":[
+            {    
+            "nombre": "Colombia",
+            "codAlfa2": "CO",
+            "codAlfa3" : "COL",
+            "codNum" :170,
+            "departamentos":[
+                {
+                "codigo":"05",
+                "nombre":"Antioquia",
+                "iso":"ANT",
+                "ciudades":[  
+                    {
+                    "nombre":"MEDELLIN",
+                    "codigo":"05001"
+                    },  
+                    {
+                    "nombre":"BELLO",
+                    "codigo":"05088"
+                    },
+                    {
+                    "nombre":"CALDAS",
+                    "codigo":"05129"
+                    },
+                    {
+                    "nombre":"ENVIGADO",
+                    "codigo":"05266"
+                    },
+                    {
+                    "nombre":"COPACABANA",
+                    "codigo":"05212"
+                    },
+                    {
+                    "nombre":"GIRARDOTA",
+                    "codigo":"05308"
+                    },
+                    {
+                    "nombre":"GUARNE",
+                    "codigo":"05318"
+                    },
+                    {
+                    "nombre":"ITAGUI",
+                    "codigo":"05360"
+                    },
+                    {
+                    "nombre":"GUATAPE",
+                    "codigo":"05321"
+                    },
+                    {
+                    "nombre":"LA ESTRELLA",
+                    "codigo":"05380"
+                    },
+                    {
+                    "nombre":"LA UNION",
+                    "codigo":"05400"
+                    },
+                    {
+                    "nombre":"MARINILLA",
+                    "codigo":"05440"
+                    },
+                    {
+                    "nombre":"RETIRO",
+                    "codigo":"05607"
+                    },
+                    {
+                    "nombre":"RIONEGRO",
+                    "codigo":"05607"
+                    },
+                    {
+                    "nombre":"SABANETA",
+                    "codigo":"05631"
+                    },
+                    {
+                    "nombre":"RIONEGRO",
+                    "codigo":"05607"
+                    },
+                    {
+                    "nombre":"ABEJORRAL",
+                    "codigo":"05002"
+                    },
+                    {
+                    "nombre":"LA CEJA",
+                    "codigo":"05376"
+                    },
+                    {
+                    "nombre":"ENTRERRIOS",
+                    "codigo":"05264"
+                    }     
+                    ]
+                },
+                {
+                "codigo":"08",
+                "nombre":"Atlantico",
+                "iso":"ATL",
+                "ciudades":[
+                    {
+                    "nombre":"BARRANQUILLA",
+                    "codigo":"08001"
+                    } ,
+                    {
+                    "nombre":"GALAPA",
+                    "codigo":"08296"
+                    } ,
+                    {
+                    "nombre":"SOLEDAD",
+                    "codigo":"08758"
+                    } ,
+                    {
+                    "nombre":"TUBARA",
+                    "codigo":"08832"
+                    } , 
+                    {
+                    "nombre":"MALAMBO",
+                    "codigo":"08433"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"66",
+                "nombre":"Risaralda",
+                "iso":"RIS",
+                "ciudades":[
+                    {
+                    "nombre":"DOSQUEBRADAS",
+                    "codigo":"66170"
+                    }   
+                ]
+                },
+                {
+                "codigo":"76",
+                "nombre":"Valle del Cauca",
+                "iso":"VAC",
+                "ciudades":[
+                    {
+                    "nombre":"CALI",
+                    "codigo":"76001"
+                    },
+                    {
+                    "nombre":"YUMBO",
+                    "codigo":"76892"
+                    },
+                    {
+                    "nombre":"ALCALÁ",
+                    "codigo":"76020"
+                    }
+                    ]
+                },
+                {
+                "codigo":"63",
+                "nombre":"Quindio",
+                "iso":"QUI",
+                "ciudades":[
+                    {
+                    "nombre":"ARMENIA",
+                    "codigo":"63001"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"54",
+                "nombre":"Norte de Santander",
+                "iso":"NSA",
+                "ciudades":[
+                    {
+                    "nombre":"CÚCUTA",
+                    "codigo":"54001"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"47",
+                "nombre":"Magdalena",
+                "iso":"MAG",
+                "ciudades":[
+                    {
+                    "nombre":"SANTA MARTA",
+                    "codigo":"47001"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"19",
+                "nombre":"CAUCA",
+                "iso":"CAU",
+                "ciudades":[
+                    {
+                    "nombre":"CAUCA",
+                    "codigo":"19573"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"13",
+                "nombre":"Bolivar",
+                "iso":"BOL",
+                "ciudades":[
+                    {
+                    "nombre":"CARTAGENA DE INDIAS",
+                    "codigo":"13001"
+                    }   
+                    ]
+                },
+                {
+                "codigo":"11",
+                "nombre":"Bogota",
+                "iso":"DC",
+                "ciudades":[
+                    {
+                    "nombre":"BOGOTA, D.C.",
+                    "codigo":"11001"
+                    }   
+                    ]
+                }
+            ]
+            },{
+            "nombre": "Republica Dominicana",
+            "codAlfa2": "DO",
+            "codAlfa3" : "DOM",
+            "codNum" :214,
+            "departamentos":[
+                {
+                    "nombre": "Santo Domingo",
+                    "codigo" : "010000",
+                    "iso" : "01",
+                    "ciudades":[
+                        {
+                            "nombre":"Santo Domingo",
+                            "codigo":"3166-2"
+                        }
+                    ]
+                }
+                ]
+            }
+    ]
+}

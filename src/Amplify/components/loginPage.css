@@ -1,0 +1,30 @@
+
+.amplify-tabs-item:hover {
+    background-color: lightGray;
+    border-color: black;
+  }
+  
+  .amplify-tabs-item[data-state=active]  {
+    background-color:white;
+    border-color: black;
+    color: black;
+  }
+  
+  .amplify-tabs-item:focus {
+    border-color: black;
+    color: black;
+  }
+
+  .amplify-tabs-item:hover {
+    background-color: rgb(223, 223, 223);
+    border-color: black;
+    color: black;
+  }
+  /* styles.css */
+
+  .amplify-button--primary {
+    background-color: #000000;
+  }
+  .amplify-button--primary:hover {
+    background-color: #717171;
+  }

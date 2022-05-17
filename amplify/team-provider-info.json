@@ -1,0 +1,30 @@
+{
+  "devgf": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-grafinteractivo-devgf-161021-authRole",
+      "UnauthRoleArn": "arn:aws:iam::010066172230:role/amplify-grafinteractivo-devgf-161021-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::010066172230:role/amplify-grafinteractivo-devgf-161021-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-grafinteractivo-devgf-161021-deployment",
+      "UnauthRoleName": "amplify-grafinteractivo-devgf-161021-unauthRole",
+      "StackName": "amplify-grafinteractivo-devgf-161021",
+      "StackId": "arn:aws:cloudformation:us-east-1:010066172230:stack/amplify-grafinteractivo-devgf-161021/c9cc96a0-c349-11ec-90ae-123d316ae20d",
+      "AmplifyAppId": "d1jzxp3gh4w90p"
+    },
+    "categories": {
+      "auth": {
+        "grafinteractivo": {}
+      },
+      "function": {
+        "grafinteractivo1179ce4bPostConfirmation": {
+          "deploymentBucketName": "amplify-grafinteractivo-devgf-161021-deployment",
+          "s3Key": "amplify-builds/grafinteractivo1179ce4bPostConfirmation-7733465776504a4d3442-build.zip"
+        },
+        "AdminQueries94966d90": {
+          "deploymentBucketName": "amplify-grafinteractivo-devgf-161021-deployment",
+          "s3Key": "amplify-builds/AdminQueries94966d90-48457a77326175787763-build.zip"
+        }
+      }
+    }
+  }
+}

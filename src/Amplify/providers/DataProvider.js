@@ -1,0 +1,348 @@
+import { API, GRAPHQL_AUTH_MODE } from "@aws-amplify/api";
+import { AdminQueries } from "./AdminQueries";
+import { Filter } from "./Filter";
+import { Pagination } from "./Pagination";
+
+
+const defaultOptions = {
+    authMode: GRAPHQL_AUTH_MODE.AMAZON_COGNITO_USER_POOLS,
+    enableAdminQueries: false,
+  };
+
+export class DataProvider {
+  
+   constructor(operations, options) {
+    this.queries = operations.queries;
+    this.mutations = operations.mutations;
+
+    this.authMode = options?.authMode || defaultOptions.authMode;
+    this.enableAdminQueries =
+      options?.enableAdminQueries || defaultOptions.enableAdminQueries;
+
+    DataProvider.storageBucket = options?.storageBucket;
+    DataProvider.storageRegion = options?.storageRegion;
+  }
+
+   getList = async (
+    resource,
+    params
+    )  => {
+    if (this.enableAdminQueries && resource === "cognitoUsers") {
+      return AdminQueries.listCognitoUsers(params);
+    }
+
+    if (this.enableAdminQueries && resource === "cognitoGroups") {
+      return AdminQueries.listCognitoGroups(params);
+    }
+
+    const { filter } = params;
+
+    let queryName = Filter.getQueryName(this.queries, filter);
+    let queryVariables = Filter.getQueryVariables(filter);
+
+    if (!queryName || !queryVariables) {
+      // Default list query without filter
+      queryName = this.getQueryName("list", resource);
+    }
+
+    const query = this.getQuery(queryName);
+
+    if (!queryVariables) {
+      queryVariables = {};
+    }
+
+    const { page, perPage } = params.pagination;
+
+    // Defines a unique identifier of the query
+    const querySignature = JSON.stringify({
+      queryName,
+      queryVariables,
+      perPage,
+    });
+
+    const nextToken = Pagination.getNextToken(querySignature, page);
+
+    // Checks if page requested is out of range
+    if (typeof nextToken === "undefined") {
+      return {
+        data: [],
+        total: 0,
+      }; // React admin will redirect to page 1
+    }
+
+    // Adds sorting if requested
+    if (params.sort.field === queryName) {
+      queryVariables["sortDirection"] = params.sort.order;
+    }
+
+    // Executes the query
+    const queryData = (
+      await this.graphql(query, {
+        ...queryVariables,
+        limit: perPage,
+        nextToken,
+      })
+    )[queryName];
+
+    // Saves next token
+    Pagination.saveNextToken(queryData.nextToken, querySignature, page);
+
+    // Computes total
+    let total = (page - 1) * perPage + queryData.items.length;
+    if (queryData.nextToken) {
+      total++; // Tells react admin that there is at least one more page
+    }
+
+    return {
+      data: queryData.items,
+      total,
+    };
+  };
+
+  getOne = async (
+    resource,
+    params
+    ) => {
+    if (this.enableAdminQueries && resource === "cognitoUsers") {
+      return AdminQueries.getCognitoUser(params);
+    }
+
+    const queryName = this.getQueryName("get", resource);
+    const query = this.getQuery(queryName);
+
+    // Executes the query
+    const queryData = (await this.graphql(query, { id: params.id }))[queryName];
+
+    return {
+      data: queryData,
+    };
+  };
+
+  getMany = async (
+    resource,
+    params
+  ) => {
+    if (this.enableAdminQueries && resource === "cognitoUsers") {
+      return AdminQueries.getManyCognitoUsers(params);
+    }
+
+    const queryName = this.getQueryName("get", resource);
+    const query = this.getQuery(queryName);
+
+    const queriesData = [];
+
+    // Executes the queries
+    for (const id of params.ids) {
+      try {
+        const queryData = (await this.graphql(query, { id }))[queryName];
+        queriesData.push(queryData);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    return {
+      data: queriesData,
+    };
+  };
+
+  getManyReference = async (
+    resource,
+    params
+  ) => {
+    const { filter = {}, id, pagination, sort, target } = params;
+    const splitTarget = target.split(".");
+
+    // splitTarget is used to build the filter
+    // It must be like: queryName.resourceID
+    if (splitTarget.length === 2) {
+      if (!filter[splitTarget[0]]) {
+        filter[splitTarget[0]] = {};
+      }
+
+      filter[splitTarget[0]][splitTarget[1]] = id;
+    } else {
+      const queryName = this.getQueryNameMany("list", resource, target);
+      if (!filter[queryName]) {
+        filter[queryName] = {};
+      }
+      filter[queryName][target] = id;
+    }
+
+    return this.getList(resource, { pagination, sort, filter });
+  };
+
+  create = async (
+    resource,
+    params
+    ) => {
+    const queryName = this.getQueryName("create", resource);
+    const query = this.getQuery(queryName);
+
+    // Executes the query
+    const queryData = (await this.graphql(query, { input: params.data }))[
+      queryName
+    ];
+
+    return {
+      data: queryData,
+    };
+  };
+
+  update = async (
+    resource,
+    params
+    ) => {
+    const queryName = this.getQueryName("update", resource);
+    const query = this.getQuery(queryName);
+
+    // Removes non editable fields
+    const { data } = params;
+    delete data._deleted;
+    delete data._lastChangedAt;
+    delete data.createdAt;
+    delete data.updatedAt;
+
+    // Executes the query
+    const queryData = (await this.graphql(query, { input: data }))[queryName];
+
+    return {
+      data: queryData,
+    };
+  };
+
+  // This may not work for API that uses DataStore because
+  // DataStore works with a _version field that needs to be properly set
+  updateMany = async (
+    resource,
+    params
+  ) => {
+    const queryName = this.getQueryName("update", resource);
+    const query = this.getQuery(queryName);
+
+    // Removes non editable fields
+    const { data } = params;
+    delete data._deleted;
+    delete data._lastChangedAt;
+    delete data.createdAt;
+    delete data.updatedAt;
+
+    const ids = [];
+
+    // Executes the queries
+    for (const id of params.ids) {
+      try {
+        await this.graphql(query, { input: { ...data, id } });
+        ids.push(id);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    return {
+      data: ids,
+    };
+  };
+
+  delete = async (
+    resource,
+    params
+  ) => {
+    const queryName = this.getQueryName("delete", resource);
+    const query = this.getQuery(queryName);
+
+    const { id, previousData } = params;
+    const data = { id }
+
+    if (previousData._version) {
+      data._version = previousData._version;
+    }
+
+    // Executes the query
+    const queryData = (await this.graphql(query, { input: data }))[queryName];
+
+    return {
+      data: queryData,
+    };
+  };
+
+  deleteMany = async (
+    resource,
+    params
+  ) => {
+    const queryName = this.getQueryName("delete", resource);
+    const query = this.getQuery(queryName);
+
+    const ids = [];
+
+    // Executes the queries
+    for (const id of params.ids) {
+      try {
+        await this.graphql(query, { input: { id } });
+        ids.push(id);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    return {
+      data: ids,
+    };
+  };
+
+  getQuery(queryName) {
+    if (this.queries[queryName]) {
+      return this.queries[queryName];
+    }
+
+    if (this.mutations[queryName]) {
+      return this.mutations[queryName];
+    }
+
+    console.log(`Could not find query ${queryName}`);
+
+    throw new Error("Data provider error");
+  }
+
+  getQueryName(operation, resource) {
+    const pluralOperations = ["list"];
+    if (pluralOperations.includes(operation)) {
+      return `${operation}${
+        resource.charAt(0).toUpperCase() + resource.slice(1)
+      }`;
+    }
+    // else singular operations ["create", "delete", "get", "update"]
+    return `${operation}${
+      resource.charAt(0).toUpperCase() + resource.slice(1, -1)
+    }`;
+  }
+
+  getQueryNameMany(
+    operation,
+    resource,
+    target
+  ) {
+    const queryName = this.getQueryName(operation, resource);
+
+    return `${queryName}By${
+      target.charAt(0).toUpperCase() + target.slice(1, -2)
+    }Id`;
+  }
+
+  async graphql(
+    query,
+    variables
+  )  {
+    const queryResult = await API.graphql({
+      query,
+      variables,
+      authMode: this.authMode,
+    });
+
+    if (queryResult.errors || !queryResult.data) {
+      throw new Error("Data provider error");
+    }
+
+    return queryResult.data;
+  }
+}

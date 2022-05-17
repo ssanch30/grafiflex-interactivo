@@ -1,0 +1,266 @@
+enum RolCliente {
+  COMPRAS
+  PRODUCCION
+  DISENO
+  GERENCIA
+  ADMINISTRACION
+  VENTAS
+}
+
+type ContactoCliente @model @auth(rules: [{allow: public}]) @key(name: "byCliente", fields: ["clienteID"], queryField: "listContactoClientesByClienteId") {
+  id: ID!
+  nombre: String
+  email: String
+  cargo: String
+  enviarFactura: Boolean
+  rol: RolCliente
+  cel: String
+  clienteID: ID
+}
+
+type DatosFacturacion {
+  formaPago: String
+  iva: Boolean
+  variacionTRM: Boolean
+  validarCxC: Boolean
+  retefuenteType: String
+  retefuentePorc: Float
+  reteIvaPorc: Float
+  reteIcaPorc: Float
+  precioProducto: [PrecioProductos]
+  regimenAdq: RegimenAdq
+  tipoPersonaAdq: TipoPersonaAdq
+}
+
+type SubProductos {
+  nombre: String
+  precio: Float
+  unidades: String
+}
+
+type PrecioProductos {
+  tipoProducto: TipoProducto
+  subProductos: [SubProductos]
+  precio: Float
+}
+
+enum TipoCorte {
+  CORTE_CUCHILLA
+  TROQUEL_RECTANGULAR
+  TROQUEL_ESPECIAL
+}
+
+type Montaje {
+  pistas: Int
+  repeticiones: Int
+  rodillo: Float
+  paso: Float
+  gapPistas: Float
+  gapRepeticiones: Float
+  anchoBobina: Float
+  desarrollo: Float
+  truncado: Boolean
+  enfrentado: Int
+  cantidadTruncado: Float
+  ancho: Float
+  alto: String
+  tipoCorte: TipoCorte
+  posicionSalida: String
+}
+
+enum Estados {
+  PENDIENTE_APROBACION_CLIENTE
+  APROBADO_CLIENTE
+  CALIDAD_RECHAZADO
+  CALIDAD_APROBADO
+  CALIDAD_SUGERENCIA
+  MONTAJE_APROBADO_CLIENTE
+  MONTAJE_PENDIENTE_APROBACION
+  COTIZADO
+  PENDIENTE_RETOQUE_FOTOGRAFICO
+  RETOQUE_TERMINADO
+  PLANCHAS_LISTAS
+  FINALIZA_PREPRENSA
+  FACTURADO
+  SUSPENDIDO
+  REMISIONADO
+  SHERPA_PEND_APROBACION
+  SHEPA_APROBADA
+}
+
+enum Plancha {
+  F45
+  F67
+  F100
+  F112
+  F155
+  TOYOBO95
+  WF80
+  KM73
+  WS94
+}
+
+enum Prioridad {
+  USUAL
+  URGENCIA
+  EMERGENCIA
+  PRIMERA_HORA
+}
+
+enum TipoProducto {
+  ARTE
+  FINALIZACION
+  OPENPRINT
+  COPIADO
+  REPETICION
+  PRUEBA_CONTRATO
+  MONTAJE
+  MAQUILA
+  POSITIVO_NEGATIVO
+  OTRO
+}
+
+type Producto @model @auth(rules: [{allow: public}]) @key(name: "byOrden", fields: ["ordenID"]) {
+  id: ID!
+  tipoProducto: TipoProducto
+  subProducto: String
+  odc: String
+  descripcionCliente: String
+  prioridad: Prioridad
+  Plancha: Plancha
+  ordenID: ID
+  responsableActual: String
+  responsables: String
+  ResponsableActual: Usuario @connection
+  estado: Estados
+  Responsables: [Usuario] @connection(keyName: "byProducto", fields: ["id"])
+  finalizacion: Montaje
+  regimenAdq: String
+  untitledfield: String
+}
+
+enum Roles {
+  COORDINACION
+  DISENO
+  CALIDAD
+  PRODUCCION
+  FACTURACION
+  CLIENTE
+  OTRO
+}
+
+type Usuario @model @auth(rules: [{allow: public}]) @key(name: "byProducto", fields: ["productoID"]) {
+  id: ID!
+  cedula: String
+  nombres: String
+  email: String
+  roles: [Roles]!
+  productoID: ID
+}
+
+enum TipoDocumento {
+  REGISTRO_CIVIL
+  TARJETA_IDENTIDAD
+  CEDULA_CIUDADANIA
+  TARJETA_EXTRANJERIA
+  CEDULA_EXTRANJERIA
+  NIT
+  PASAPORTE
+  DOC_ID_EXTRANJERO
+  NIT_OTRO_PAIS
+  NUIP
+}
+
+enum TipoPersonaAdq {
+  JURIDICA
+  NATURAL
+}
+
+enum RegimenAdq {
+  RESPONSABLE_IVA
+  NO_RESPONSABLE_IVA
+}
+
+type Maquina {
+  nombre: String
+  tipoDesarrollo: String
+  tipoMaquina: String
+  paso: Float
+  anchoBanda: String
+  velocidad: Int
+  plancha: [Plancha]
+  lpis: [Int]
+}
+
+enum SucursalEncargada {
+  ENVIGADO
+  BARRANQUILLA
+  CALI
+}
+
+enum Sector {
+  FLEXIBLES
+  ETIQUETAS
+  FUNDAS
+  CORRUGADOS
+  SACOS
+  SACHET
+  VASOS_CARTON
+  MARQUILLAS_TELAS
+  TAPAS
+  OTROS
+  BLISTER
+}
+
+type Cliente @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  nit_cedula: String
+  ciudad: String
+  sector: [Sector]
+  digitoVerificacion: Int
+  estado: Boolean
+  maquinas: [Maquina]
+  razonSocial: String
+  departamento: String
+  pais: String
+  sucursalEncargada: SucursalEncargada
+  direccion: String
+  primerNombre: String
+  segundoNombre: String
+  primerApellido: String
+  segundoApellido: String
+  tipoDocumento: TipoDocumento
+  datosFacturacion: DatosFacturacion
+  ContactoClientes: [ContactoCliente] @connection(keyName: "byCliente", fields: ["id"])
+  indicativoPais: Int
+  indicativoCiudad: Int
+  ContactoClientesId: [ID]
+  telefono: String
+}
+
+type Orden @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  numero: Int!
+  version: Int!
+  nombre: String
+  ordenNueva: Boolean
+  ordenVieja: Int
+  descripcionCliente: String
+  Productos: [Producto] @connection(keyName: "byOrden", fields: ["id"])
+  Cliente: Cliente! @connection
+  mainFiles: [S3Object]
+  auxFiles: [S3Object]
+}
+
+type S3Object {
+  bucket: String!
+  region: String!
+  key: String!
+}
+
+type Todo @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  description: String
+}
+ 
